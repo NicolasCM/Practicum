@@ -1,0 +1,228 @@
+% Palabras claves
+% Revision
+% Mejorara
+% Incorrecto
+% Cambio
+% Duda
+\documentclass[12pt,oneside]{book}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage[bookmarks=false,colorlinks = true,linkcolor = blue,urlcolor  = blue,citecolor = blue,anchorcolor = blue]{hyperref}
+\usepackage[intlimits]{amsmath}
+
+%\usepackage{amsmath}
+\usepackage{amsfonts,amssymb,amsthm,extarrows}
+\makeatletter
+\def\th@plain{
+\thm@notefont{}
+\itshape 
+}
+\def\th@definition{
+\thm@notefont{}
+\normalfont
+}
+\makeatother
+\usepackage[width=16cm,height=21cm]{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumerate}
+\usepackage{colortbl}
+\usepackage{multicol}
+\usepackage{titlesec}
+\usepackage{comment}
+\usepackage{cite}
+\usepackage{apacite}
+% \usepackage{tabularx}
+
+\titleformat{\chapter}{\bfseries\huge}{\thechapter.}{20pt}{\bfseries\huge}
+
+\newtheorem{example}{Ejemplo}
+\newtheorem*{defn}{Definici\'on}
+\newtheorem{problem}{Problema}
+\newtheorem{teorema}{Teorema}
+\newtheorem{lema}{Lema}
+\newtheorem{prop}{Proposici\'on}
+
+\newcommand{\Enteros}{{\mathbb{Z}}}
+\newcommand{\Racionales}{{\mathbb{Q}}}
+\newcommand{\Reales}{{\mathbb{R}}}
+\newcommand{\Complejos}{{\mathbb{C}}}
+
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\matr}[2]{\left[\begin{array}{#1}#2\end{array}\right]}
+\newcommand{\sen}{\mathop{\mathrm{sen}}\nolimits}
+
+\newcounter{cejer}[section]
+\newenvironment{ejer}[1][\textbf{Ejercicios }]{#1\begin{enumerate}\setcounter{enumi}{\value{cejer}}}{\setcounter{cejer}{\value{enumi}}\end{enumerate}}
+\newenvironment{demo}[1][\underline{\textsl{Demostraci\'{o}n}}]{\textbf{#1. }}{\ \rule{0.5em}{0.5em}}
+
+\renewcommand{\chaptername}{ }
+\renewcommand{\contentsname}{Sumario}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\max}{\text{m\'ax}}
+\renewcommand{\min}{\text{m\'in}}
+\renewcommand\bibname{Referencias}
+
+
+\everymath{\displaystyle}
+
+\begin{document}
+
+\begin{titlepage}
+\vspace{3cm}
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=8cm]{ana}
+\end{figure}
+\hspace{.6\textwidth}
+\vspace{2cm}
+
+\begin{center}
+{\LARGE \textbf{An\'alisis de conglomerados sobre series de tiempo. Utilizando una modificiaci\'on de la divergencia de Kullback-Liebler sobre la densidad espectral}}\break
+	\vspace{2cm} 
+
+		{\Large Facultad de Ciencias Actuariales}\\
+		{\Large Alumno: Campos Mart\'inez Joaqu\'in Nicol\'as}\\
+		{\Large Asesor: Dr. Cuevas Covarrubias Carlos}
+		\end{center}
+
+		\end{titlepage}
+%=====================================================================================================================
+% Indice
+%=====================================================================================================================
+\tableofcontents %Genera el indice
+\setcounter{page}{0}
+%=====================================================================================================================
+%Resumen ejecutivo
+%=====================================================================================================================
+\chapter*{Res\'umen Ejecutivo} 
+\setcounter{page}{0}
+%=====================================================================================================================
+%Chapter 1 {An\'alisis de conglomerados}
+%=====================================================================================================================
+\chapter{An\'alisis de conglomerados} 
+<<Clustering is a division of data into groups of similar objects. Each group, called cluster, consists of objects that are similar between themselves and dissimilar to objects of other groups.>>~\cite{DefClust}
+
+% Representing data by fewer clusters necessarily loses certain fine details (akin to lossy data compression), but achieves simplification. It represents many data objects by few clusters, and hence, it models data by its clusters.Data modeling puts clustering in a historical perspective rooted in mathematics, statistics,and numerical analysis. From a machine learning perspective clusters correspond to hidden patterns, the search for clusters is unsupervised learning, and the resulting system represents a data concept. Therefore, clustering is unsupervised learning of a hidden data concept. Data mining deals with large databases that impose on clustering analysis additional severe computational requirements. These challenges led to the emergence of powerful broadly applicable data mining clustering methods surveyed below.
+%=====================================================================================================================
+%Section 1.1 {Tema}
+%=====================================================================================================================
+\section{Tema}
+El tema general es \textit{an\'alisis de conglomerados}, con un enfoque a \textbf{series de tiempo}. Es decir la agrupaci\'on de series de tiempo en diferentes grupos seg\'un su <<similitud>>. 
+\\\\
+Una de las principales motivaciones fue el plantemiento de un problema de unsupervised pattern recognition, el cual consiste en lo siguiente. Dado un grupo de canciones, deseamos crear listas de reproducci\'on que suenen bien. Por sonar bien, queremos decir que las listas de reproducci\'on presenten <<sinergia>>.
+\\\\
+% Nuestro acercamiento consiste en tomar las funci\'on de \textbf{densidad espectral} varias series de tiempo, o una fracci\'on de las mismas; y luego aplicar la divergencia de \textbf{Kullback-Liebler} como m\'edida de distancia entre las funciones de densidad. Y luego aplicar alg\'un algoritmo jerarquico de aglomeraci\'on.
+% Podemos interpretar a la m\'usica como una serie de tiempo, y podmeos realizar un acercamiento por metodolog\'ias aplicables a series de tiempo. Cabe mencionar esta no es la \'unica aplicaci\'on. 
+%=====================================================================================================================
+%Section 1.2 {Objetivo}
+%=====================================================================================================================
+\section{Objetivo}
+Deseamos probar la calidad de una metodolog\'ia para conlglomerar series de tiempo basada en \textbf{an\'alisis espectral} y la \textbf{divergencia de Kullback-Liebler} como medida de distancia entre series de tiempo. En nuestro caso se utilizar\'a un m\'etodo de conglomeraci\'on jer\'arquico. Y deseamos conocer si este enfoque posee ventajas intr\'insecas sobre otras metodolog\'ias de conlgomeraci\'on de series de tiempo, o si revela informaci\'on relevante sobre las series de tiempo.
+%Mejora Buscar sobre pruebas de calidad sobre los clusters
+%=====================================================================================================================
+%Section 1.3 {Relevancia}
+%=====================================================================================================================
+\section{Relevancia}
+El an\'alisis de conglomerados suele ser uno de los primero acercamientos en el an\'alisis exploratorio. Por otro lado, las series de tiempo pueden ser observadas en diferentes \'ambitos informaci\'on de ventas, precios de acciones, tasas cambiarias, informaci\'on sobre el clima, datos biom\'edicos, etc. ~\cite{TimeSeries}\\\\
+Las aplicaciones de an\'alisis de conglomerados en estos \'ambitos son variadas, por ejemplo, en medicina es importante reconocer la diferencia entre se\~nales normales en un ECG, EEG, EMG de aquellas producidas por enfermedades. En sismolog\'ia, para discriminar las ondas s\'ismicas, de los moviemientos normales de la tierra~\cite{TimeSeries2}. 
+
+Otras aplicaciones son, en astronom\'ia las curvas de luz muestran el brillo de una estrella en un periodo de tiempo, en medicina la actividad cerebral, en el medio ambiente y urbanizaci\'on los niveles de la marea, niveles de contaminantes en el aire ($PM_{2.5}, PM_{10}$)~\cite{TimeSeries}.
+%=====================================================================================================================
+%Chapter 2 {Antecedentes}
+%=====================================================================================================================
+\chapter{Antecedentes}
+Hay m\'ultiples art\'iculos sobre an\'alisis de conglomerados, y algunos de ellos se enfocan en series de tiempo. \textit{Time-series clustering - A decade review}~\cite{TimeSeries} tiene como objetivo comparar los enfoques m\'as populares.\\
+<<This review will expose four main components of time-series clustering and is aimed to represent an updated investigation on the trend of improvements in efficiency, quality and complexity of clustering time-series approaches during the last decade and enlighten new paths for future works>>~\cite{TimeSeries}\\\\
+
+\textit{Clustering of time series data - a survey} busca resumir investigaci\'on realizada en el tema y sus aplicaciones en varios campos. Incluye aspectos basicos de los algoritmos m\'as generales que se utilizan en estudios de conglomerados, medidas de similitud y disimilitud, evaluaci\'on de conglomerados.~\cite{TimeSeries3}\\\\
+
+Ambos art\'iculos distinguen 3 principales categorizaciones de los acercamientos a conglomeraci\'on de series de tiempo, trabajar con los datos brutos, extraer <<caracter\'isticas>> de los datos, basarse en un modelo al que se ajusten los datos. \\\\
+
+<<Computational Models of Music Similarity and their Application in Music Information Retrieval>> es una tesis que busca mostrar el desarrollo de las t\'ecnicas de descubrimiento de m\'usica basado en medidas de similitud y disimilitud. Uno de los enfoques consiste en utilizar de funci\'on de densidad espectral. Sin embargo tambi\'en utiliza t\'ecnicas aplicables a series de tiempo.~\cite{Music}
+%=====================================================================================================================
+%Chapter 3 {Metodolog\'ia}
+%=====================================================================================================================
+\chapter{Metodolog\'ia}
+Primero introduciremos el concepto de an\'alisis de conglomerados, motivaciones para su estudio, los algoritmos m\'as populares, y su uso en nuestra \'area de inter\'es.\\\\
+Luego hablaremos sobre los conceptos de an\'alisis espectral, funci\'on de densidad espectral, como aproximarla apartir de datos, interpretaci\'on y uso. Luego estudiaremos la divergencia de Kullback-Liebler, indicaremos sus caracter\'isitcas y sus fallos como medida de distancia, introduciremos una forma de simetrizarla, y buscaremos probar que cumpla la desigualdad del tri\'angulo.\\\\
+Luego procederemos a probar este enfoque, mediante la selecci\'on de m\'utiples algoritmos jer\'arquicos de conglomeraci\'on. Luego escogeremos un tipo de dato de serie de tiempo para aplicar el an\'alisis, despu\'es utilizaremos pruebas sobre los conglomerados obtenidos para verificar su calidad. Despu\'es compararemos con otras metodolog\'ias disponibles en paquetes o repositorios.
+%=====================================================================================================================
+%Chapter 4 {Fuentes de datos}
+%=====================================================================================================================
+\chapter{Fuentes de datos}
+La cantidad de informaci\'on disponible actualmente es impresionante, y se puede obtener de distintas formas, mediante bases de datos online, minando informaci\'on, o simplemente checando el registro de nuestras acciones. \\\\
+
+Para efectos de este estudio, los datos se obtendr\'an de distintas fuentes, principalmente de archivos de audio, mp3, representando m\'usica obtenidos mediante compra en distintos servicios iTunes Store\textcopyright, Bandcamp\textcopyright, o adquiridos gratuitamente. Los datos se extraer\'an mediante con la ayuda de 2 librer\'ias del R <<tuneR>> y <<seewave>>. Las cu\'ales contienen funcionalidad para trabajar con ondas, archivos de m\'usica, etc. Otra fuente es los precios de acciones en adquiridos mediante Yahoo Finance \textcopyright\\\\
+%=====================================================================================================================
+%Chapter 5 {An\'alisis y desarrollo}
+%=====================================================================================================================
+\chapter{An\'alisis y desarrollo}
+\section{Introducci\'on a an\'alisis de conglomerados}
+Como hab\'iamos mencionado an\'alisis de conglomerados es una t\'ecnica cuyo objetivo es agrupar en m\'ultiples clases seg\'un sus caracter\'isticas.\\\\
+Existen distintas metodolog\'ias. Las m\'as simples y conocida son las jer\'arquicas. Que se subdividen en 2 grupos divisivas y aglomerativas.
+% Reference
+Los algoritmos divisivos, comienzan con todos los objetos en un mismo conglomerado, y comienzan a separarlo utilizando un criterio de optimizaci\'on, y continua hasta separar todos los objetos. Los algoritmos aglomerativos, trabajan en sentido contrario, toman cada objeto como un conglomerado separado, y comienza a agrupar los conglomerados m\'as cercanos basado en una regla de distancia o similitud entre conglomerados.\\\\
+
+%=====================================================================================================================
+%Chapter 6 {Expectativas Practicum II}
+%=====================================================================================================================
+\chapter{Expectativas Practicum II}
+
+%=====================================================================================================================
+%Chapter 6 {Plan de trabajo}
+%=====================================================================================================================
+\chapter{Plan de trabajo}
+\section{Horario}
+\begin{tabular}{ c | c }
+  \textbf{D\'ias} & \textbf{Horario} \\
+  Mi\'ercoles & 10:00 - 13:00  \\
+  Jueves & 16:00 - 19:00  \\
+  Viernes & 12:00 - 13:00  \\
+\end{tabular}
+\section{Avances}
+\begin{tabular}{|p{2cm}|p{4cm}|p{12cm}|}
+  \textbf{Estatus} & \textbf{D\'a} & \textbf{Avance} \\
+   No terminado & 18, Septiembre, 2017 & Resumen y an\'alisis  de la lectura \textit{Time-series clustering – A decade review} \\
+   \hline\\
+   No terminado & 20, Septiembre, 2017 & Primer escrito sobre el tema, las herramientas disponibles, procedimientos aplicables y obtenci\'on de informaci\'on\\
+   \hline\\
+   No iniciado & 25, Septiembre, 2017 & Resumen y an\'alisis  de la lectura \textit{PATTERN CLUSTERING BY MULTIVARIATE MIXTURE ANALYSIS}\\
+   \hline\\
+   No iniciado & 27, Septiembre, 2017 & Presentaci\'on con primeros avance y pruebas\\
+   \hline\\
+   No iniciado & 14, Septiembre, 2017 & Resumen y an\'alisis  de la lectura \textit{Overlapping Clustering: A New Method for Product Positioning}\\
+   \hline\\
+   No iniciado & 02, Obtubre, 2017 & Breve Resumen y an\'alisis  del libro \textit{Data Clustering Theory, Algorithms, and Applications}\\
+   \hline\\
+   No iniciado & 09, Octubre, 2017 & Resumen y an\'alisis  de la lectura \textit{Clustering of time series data — a survey}\\
+   \hline\\
+   No iniciado & 16, Obtubre, 2017 & Resumen y an\'alisis  de la lectura \textit{Latent class models for clustering: A comparison with K-means}\\
+   \hline\\
+   No iniciado & 18, Octubre, 2017 & Segundo excrito sobre el comportamiento de los datos, y los resultados de utilizar los m\'etodos cl\'asicos, presentaci\'on de resultados, ventajas y desventajas\\
+   \hline\\
+   Pr\'oximamente & Pr\'oximamente\\
+\end{tabular}
+%=====================================================================================================================
+%Chapter  {Conclusiones}
+%=====================================================================================================================
+\chapter*{Conclusiones}
+%=====================================================================================================================
+%Bibliograf\'ia
+%=====================================================================================================================
+\bibliography{Tar}{}
+\bibliographystyle{apacite}
+% \begin{thebibliography}{9}
+% \bibitem{CAST}
+%   Saeed Aghabozorgi, Ali Seyed Shirkhorshidi, Teh Ying Wah,
+%   2014,
+%   \textit{Time-series clustering – A decade review},
+%   Obtenido de \url{http://www.sciencedirect.com/science/article/pii/S0306437915000733?via%3Dihub}
+% \bibitem{CAD}
+%   Pradeep Rai, Shubha Singh,
+%   2010,
+%   \textit{A Survey of Clustering Techniques},
+%   Obtenido de \url{http://www.ijcaonline.org/volume7/number12/pxc3871808.pdf}
+% \end{thebibliography}
+\end{document}
