@@ -1,0 +1,526 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%% asme2ej.tex %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Template for producing ASME-format journal articles using LaTeX    %
+% Written by   Harry H. Cheng, Professor and Director                %
+%              Integration Engineering Laboratory                    %
+%              Department of Mechanical and Aeronautical Engineering %
+%              University of California                              %
+%              Davis, CA 95616                                       %
+%              Tel: (530) 752-5020 (office)                          %
+%                   (530) 752-1028 (lab)                             %
+%              Fax: (530) 752-4158                                   %
+%              Email: hhcheng@ucdavis.edu                            %
+%              WWW:   http://iel.ucdavis.edu/people/cheng.html       %
+%              May 7, 1994                                           %
+% Modified: February 16, 2001 by Harry H. Cheng                      %
+% Modified: January  01, 2003 by Geoffrey R. Shiflett                %
+% Use at your own risk, send complaints to /dev/null                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%% use twocolumn and 10pt options with the asme2ej format
+\documentclass[twocolumn,10pt]{asme2ej}
+
+\usepackage{epsfig} %% for loading postscript figures
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\decimalpoint
+\usepackage[bookmarks=false,colorlinks = true,linkcolor = blue,urlcolor  = blue,citecolor = blue,anchorcolor = blue]{hyperref}
+\usepackage[intlimits]{amsmath}
+
+%\usepackage{amsmath}
+\usepackage{amsfonts,amssymb,amsthm,extarrows}
+\makeatletter
+\def\th@plain{
+\thm@notefont{}
+\itshape 
+}
+\def\th@definition{
+\thm@notefont{}
+\normalfont
+}
+\makeatother
+% \usepackage[width=16cm,height=21cm]{geometry}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{enumerate}
+\usepackage{colortbl}
+\usepackage{multicol}
+\usepackage{titlesec}
+\usepackage{comment}
+\usepackage{cite}
+\usepackage{apacite}
+\usepackage{mathtools}
+\usepackage{caption}
+\usepackage{float}
+
+% \titleformat{\chapter}{\bfseries\huge}{\thechapter.}{20pt}{\bfseries\huge}
+
+\newtheorem{example}{Ejemplo}
+\newtheorem*{defn}{Definici\'on}
+\newtheorem{problem}{Problema}
+\newtheorem{teorema}{Teorema}
+\newtheorem{lema}{Lema}
+\newtheorem{prop}{Proposici\'on}
+
+\newcommand{\Enteros}{{\mathbb{Z}}}
+\newcommand{\Racionales}{{\mathbb{Q}}}
+\newcommand{\Reales}{{\mathbb{R}}}
+\newcommand{\Complejos}{{\mathbb{C}}}
+
+\renewcommand{\phi}{\varphi}
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\matr}[2]{\left[\begin{array}{#1}#2\end{array}\right]}
+\newcommand{\sen}{\mathop{\mathrm{sen}}\nolimits}
+
+\newcounter{cejer}[section]
+\newenvironment{ejer}[1][\textbf{Ejercicios }]{#1\begin{enumerate}\setcounter{enumi}{\value{cejer}}}{\setcounter{cejer}{\value{enumi}}\end{enumerate}}
+\newenvironment{demo}[1][\underline{\textsl{Demostraci\'{o}n}}]{\textbf{#1. }}{\ \rule{0.5em}{0.5em}}
+
+% \renewcommand{\chaptername}{ }
+% \renewcommand{\contentsname}{Sumario}
+\renewcommand{\abstract}{Introducci\'on}
+\renewcommand{\figurename}{Figura}
+\renewcommand{\max}{\text{m\'ax}}
+\renewcommand{\min}{\text{m\'in}}
+\renewcommand\bibname{Referencias}
+
+
+\everymath{\displaystyle}
+
+\title{An\'alisis de conglomerados y clasificaci\'on de series de tiempo. Utilizando Kullback-Liebler sobre la densidad espectral. Un ejemplo aplicado a audio de gatos y perros}
+
+%%% first author
+\author{Campos Mart\'inez Joaqu\'in Nicol\'as
+    \affiliation{
+	Alumno de Actuar\'ia\\
+	Facultad de Ciencias Actuariales\\
+	Universidad An\'ahuac Campus Norte\\
+    }	
+}
+\begin{document}
+\maketitle 
+\section*{Introducci\'on} % (fold)
+\label{sec:introduccion}
+En este practicum queremos mostrar el uso de la densidad espectral para clasificar series de tiempo, algunas de las razones que impulsaron está idea fueron: primero algunos ejemplos, particularmente la clasificación de temblores basada en esta misma metodología\cite{SUBJ_SP1}\cite{SUBJ_SP2}, en el caso de Shumway como un medio para monitorear que se respeten las reglas internacionales de pruebas nucleares. Tambi\'en tenemos el caso de la clasificaci\'on de flamas seg\'un el sonido generado en la combusti\'on.\cite{SUBJ_SP3}\\
+
+La primera parte del texto consiste en un ejemplo de la clasificaci\'on de audios de perros y gatos que forma parte de una base de datos de 48 clases ac\'usticas adicionales, utilizada en un art\'iculo sobre redes neuronales \cite{DATOS}.\\
+
+La base utilizada consta de 164 archivos WAV con sonidos de gatos, maullidos, ronroneos, o similares y 113 sonidos de perros, ladridos principalmente. Decidimos seguir el ejercio propuesto en el sitio Kaggle\cite{DATOS2}, donde se propone dividir la muestra en conjunto de entranamiento con 115 archivos de gatos y 64 de perros, los 49 restantes de cada categor\'ia se asignan al conjunto de prueba.\\
+
+Los resultados preliminares son bastante satisfactorios, y notamos que el espectro de maullidos es muy distinto de ladridos en t\'erminos de duraci\'on y harmon\'ia.\\
+
+La segunda parte del texto utiliza los mismos 277 archivos de audio utilizados en el ejemplo anterior, en este caso presentamos los resultaod s
+
+Al final proponemos como ejercicio el posible uso en la clasificaci\'on de series de tiempo econ\'omicas, particularmente de precios de acciones o activos, de modo que podemos categorizar por estructuras de covarianza con un análisis de conglomerados, así podríamos decir que activos en un mismo grupo tienen un riesgo similar.\\
+% section introduccion (end)
+\section{Objetivo} % (fold)
+\label{sec:objetivo}
+% Nuestro objetivo es presentar una metodolog\'ia que sirva como apoyo en la selecci\'on de modelos de series de tiempo, la primera forma es la aplicaci\'on a problemas de clasificaci\'on y conglomeraci\'on' en distintos grupos utilizando la funci\'on de densidad espectral. La segunda aplicaci\'on es el uso para la selecci\'on de un modelo SARIMA sobre otro prospecto basandonos en la funci\'on de densiada espectral te\'orica.
+
+Nosotros queremos presentar una metodolog\'ia de clasificaci\'on y conglomeraci\'on de series de tiempo basada en la estructura de correlaci\'on. Nuestra base es utilizar la medida de discrepancia de Kullback-Liebler sobre la densidad espectral para clasificar en un grupo, seg\'un el espectro medio de cada grupo.
+
+
+
+% Nuestro objetivo es elaborar un algoritmo que sirva como herramienta de apoyo para distinguir entre series de tiempo con componente autorregresiva y con componente de promedios m\'oviles utilizando la divergencia de Kullback-Liebler sobre las funciones de densidad espectral como la medida de clasificaci\'on
+% de la serie de tiempo que se estudie.
+% section objetivo (end)
+
+\section{Relevancia} % (fold)
+\label{sec:relevancia}
+% El an\'alisis de conglomerados suele ser uno de los primero acercamientos en el an\'alisis exploratorio. 
+Las series de tiempo pueden ser observadas en diferentes \'ambitos, informaci\'on de ventas, precios de acciones, tasas cambiarias, informaci\'on sobre el clima, datos biom\'edicos, etc. ~\cite{TIME_SERIES_CLUSTERING}\\\\
+Las aplicaciones de an\'alisis de conglomerados en estos \'ambitos son variadas, por ejemplo, en medicina es importante reconocer la diferencia entre se\~nales normales en un ECG, EEG, EMG de aquellas producidas por enfermedades. En sismolog\'ia, para discriminar las ondas s\'ismicas, de los moviemientos naturales de la tierra~\cite{TIME_SERIES_CLUSTERING_2} o para monitorear violaciones al CTBT (Tratado de prohibici\'on completa de los ensayos nucleares, en espa\~nol) \cite{SUBJ_SP1}.\\
+
+Otras aplicaciones son, en astronom\'ia las curvas de luz muestran el brillo de una estrella en un periodo de tiempo, en medicina la actividad cerebral, en el medio ambiente y urbanizaci\'on los niveles de la marea, niveles de contaminantes en el aire ($PM_{2.5}, PM_{10}$)~\cite{TIME_SERIES_CLUSTERING}.\\
+
+Otra raz\'on es la gesti\'on de portafolios de inversi\'on, donde se requiere diversificar el riesgo, y no tener muchas acciones de empresas con giros similares, o que esten altamente correlacionadas.
+% En ocasiones nos importa conocer series de tiempo que tienen comportamiento similar, por ejemplo en un portafolio de inversiones podemos tomar acciones de grupos cuyos elementos son similares, pero difieren de grupo a grupo.
+% En la pr\'actica, uno no sabe \textit{a priori} si una serie de tiempo tiene una componenente de promedios m\'oviles o una autorregresiva. En la metodolog\'ia Box-Jenkins no hay una forma clara de identificar esto, y nos basamos en las funciones de autocorrelaci\'on y autocorrelaci\'on parcial.\\
+
+% Nosotros queremos proponer un algoritmo que sirva como herramienta para comprobar si una ser\'ie de tiempo contiene componentes AR o MA.
+% section relevancia (end)
+\section{Antecedentes} % (fold)
+\label{sec:antecedentes}
+Hay m\'ultiples art\'iculos sobre an\'alisis de conglomerados, y algunos de ellos se enfocan en series de tiempo. \textit{Time-series clustering - A decade review}~\cite{TIME_SERIES_CLUSTERING} tiene como objetivo comparar los enfoques m\'as populares.\\
+<<This review will expose four main components of time-series clustering and is aimed to represent an updated investigation on the trend of improvements in efficiency, quality and complexity of clustering time-series approaches during the last decade and enlighten new paths for future works>>~\cite{TIME_SERIES_CLUSTERING}\\
+
+\textit{Clustering of time series data - a survey} busca resumir investigaci\'on realizada en el tema y sus aplicaciones en varios campos. Incluye aspectos basicos de los algoritmos m\'as generales que se utilizan en estudios de conglomerados, medidas de similitud y disimilitud, evaluaci\'on de conglomerados.~\cite{TIME_SERIES_CLUSTERING_3}\\
+
+Ambos art\'iculos distinguen 3 principales categorizaciones de los acercamientos a conglomeraci\'on de series de tiempo, trabajar con los datos brutos, extraer <<caracter\'isticas>> de los datos, basarse en un modelo al que se ajusten los datos. \\
+
+<<Computational Models of Music Similarity and their Application in Music Information Retrieval>> es una tesis que busca mostrar el desarrollo de las t\'ecnicas de descubrimiento de m\'usica basado en medidas de similitud y disimilitud. Uno de los enfoques consiste en utilizar de funci\'on de densidad espectral. Sin embargo tambi\'en utiliza t\'ecnicas aplicables a series de tiempo.~\cite{MUSIC}.
+
+\section{Como perros y gatos} % (fold)
+\label{sec:como_perros_y_gatos}
+Como dijimos nos centramos en 2 ejemplos, el primero consiste en crear una regla de clasificaci\'on entre la clase de perros y gatos. El segundo ejemplo es para mostrar el uso la divergencia K-L en series de tiempo.'
+\subsection{Perros vs gatos} % (fold)
+\label{sub:perros_vs_gatos}
+Nuestro ejemplo est\'a basado en \cite{DATOS2}, utilizamos 115 audios de gatos y 64 de perros para entrenar el algoritmo y 69 de cada clase para validar nuestro modelo.\\
+Primero tenemos un problema de desbalanceo en nuestro conjunto de entrenamiento, para tener la misma cantidad de observaciones de perros como de gatos utilizamos la t\'ecnica de bootstraping con reemplazo para sobremuestrear los 64 perros de entrenamiento.\\
+
+\subsubsection{An\'alisis exploratorio} % (fold)
+\label{ssub:analisis_exploratorio}
+% Cita de asking for trouble
+Observemos algunas series de tiempo de gatos y perros. La figura \ref{plot:ts_maullido1} es la gr\'afica de series de tiempo de un maullido, es bastante sostenido, y notamos que la variaci\'on aumenta del inicio del maullido a la mitad para despues bajar. Por otro lado, \ref{plot:ts_ladrido1} nos muestra un ladrido, en comparaci\'on es m\'as explosivo, en el sentido de que la varaci\'on m\'as alta es al inicio, y luego disminuye.
+\begin{figure}[h]
+  \centering
+    \includegraphics[page=1,scale=.5]{Resultados_F1.pdf}
+  \caption{La representaci\'on gr\'afica de un maullido bastante n\'itido}
+  \label{plot:ts_maullido1}
+\end{figure}
+\begin{figure}[h]
+  \centering
+    \includegraphics[page=2,scale=.5]{Resultados_F1.pdf}
+  \caption{La representaci\'on gr\'afica de un ladrido bastante n\'itido}
+  \label{plot:ts_ladrido1}
+\end{figure}
+Las gr\'aficas de series anteriores, as\'i como los espectrogramas siguientes corresponden a los archivos \textit{cat\_75.wav} y \textit{dog\_barking\_101.wav} tomados al azar de la muestra.\\
+\begin{figure}[h]
+  \centering
+    \includegraphics[page=3,scale=.5]{Resultados_F1.pdf}
+  \caption{Espectograma maullido}
+  \label{plot:spec_maullido1}
+\end{figure}
+Por un lado el maullido \ref{plot:spec_maullido1} muestra un comportamiento harm\'onico y con mayor duraci\'on que el ladrido \ref{plot:spec_ladrido1}. Esto nos lleva a pensar que podemos utilizar la densidad espectral como representaci\'on de la serie de tiempo en un an\'alisis discriminante.
+\begin{figure}[h]
+  \centering
+    \includegraphics[page=4,scale=.5]{Resultados_F1.pdf}
+  \caption{Espectograma ladrido}
+  \label{plot:spec_ladrido1}
+\end{figure}
+
+% subsubsection analisis_exploratorio (end)
+% subsection perros_vs_gatos (end)
+\section{Densidad espectral} % (fold)
+\label{sec:densidad_espectral}
+El estimador que utilizamos de la funci\'on de densidad espectral es la correci\'on al periodograma con la ventana de Hann definida por
+$$
+w(n)=\frac{1}{2}\left(1-\cos\left(\frac{2\pi n}{N-1}\right)\right)
+$$
+Donde $N$ es el n\'umero de observaciones en la serie. De modo que el espectro queda representado por
+\section{Clasifiaci\'on cortando las series} % (fold)
+\label{sec:clasifiacion_cortando_las_series}
+Los audios son de distinta duraci\'on, de modo que los espectros estimados ser\'an es distintas frecuencias, para solucionar este problema cortamos las series con la duraci\'on m\'as corta (\emph{cat\_55.wav}) de poco menos de un segundo. Partimos del punto medio de las mismas y tomamos aproximadamente medio segundo a la izquierda y medio a la derecha.
+% insertar ilustracion aqui
+\begin{figure}[h]
+  \centering
+    \includegraphics[page=1,scale=.5]{resultados2.pdf}
+  \caption{Densidad gatos 1}
+  \label{plot:dens_gato1}
+\end{figure}
+\begin{figure}[h]
+  \centering
+    \includegraphics[page=2,scale=.5]{resultados2.pdf}
+  \caption{Densidad perro 1}
+  \label{plot:dens_perro1}
+\end{figure}
+
+Una vez obtenida la densidad espectral, obtuvimos el espectro promedio por clase, la figura \ref{plot:dens_gato1} nos muestra la densidad espectral de los audios de gatos, podemos notar que tiene su moda en frecuencias bajas, y luego decae lentamente a 0. En cambio, la densidad espectral para ladridos, \ref{plot:dens_perro1}, tienen su moda en frecuencias medias, y decar r\'apidamente a 0. Ahora que tenemos nuestros espectros promedio, el siguiente paso es la regla de clasificaci\'on
+
+$$\text{clasifica en}\left\{
+\begin{array}{ccc}
+G &\text{si}&I(f_g, f)\leq I(f_p, f)\\
+P &\text{si}&I(f_g, f)>(f_p, f)\\
+\end{array}
+\right\}$$
+Donde $I(f, g)=\int_x f(x)\log(\frac{f(x)}{g(x)})dx$ es la informaci\'on de Kullback. La interpretaci\'on de $I$ es la informaci\'on media por observaci\'on en favor de $f$ contra $g$. En este caso nuestras $x$ son las frecuencias con las que estamos trabajando.
+
+Al aplicar est\'a regla obtenemos la matriz de confusi\'on para el conjunto de entrenamiento \ref{tbl:confusion_entre1}, donde nuestra tasa de error es del $17\%$. Para el conjunto de prueba nuestra matriz de confusi\'on nos indica una tasa de error del $26\%$\\
+\begin{tabular}{ccc}
+ & Gato & Perro\\
+ Gatos & 77& 37\\
+Perro & 6 & 58\\
+\label{tbl:confusion_entre1}
+% \caption{Matriz de confusi\'on conjunto de entrenamiento}
+\end{tabular}
+
+\begin{tabular}{ccc}
+ & Gato & Perro\\
+ Gatos & 36& 13\\
+Perro & 3 & 46\\
+\label{tbl:confusion_prueba1}
+% \caption{Matriz de confusi\'on conjunto de entrenamiento}
+\end{tabular}
+% subsection observando_el_sonido (end)
+% section como_perros_y_gatos (end)
+% section antecedentes (end)
+% \section{Resultados} % (fold)
+% \label{sec:resultados}
+% \subsection*{An\'alisis Exploratorio} % (fold)
+% \label{sub:analisis_exploratorio}
+% Primero calculamos la correlaci\'on de cada regresor con respecto de la respuesta (\textbf{HP}), y obtuvimos el siguiente orden de correlaci\'on \textit{defensa especial}, $.5$, \textit{progreso evolutivo}, $.48$, \textit{fase final}, $.41$, \textit{ataque}, $.31$, \textit{ataque especial}, $.24$, \textit{defensa}, $.13$, y \textit{velocidad}, $-.023$.\\
+
+% De modo que esperar\'iamos que las variables aparecieran en ese orden en todas las posibles regresiones, sin embargo veremos que no es el caso, porque algunas variables guardan la misma informaci\'on o simplemente no son relavantes para el modelo.\\
+
+% En la figura \ref{plot:do} mismo vemos que las variables tienen distribuciones similares, y particularmente detectamos un gran oulier en nuestra variable respuesta, esto corresponde al Pok\'emon llamado \textit{Chansey} que es conocido por ser parte de la l\'inea evolutiva del Pok\'emon con mayor \textbf{HP} base, \textit{Blissey}. Ahora analizaremos algunos gr\'aficos de dispersi\'on para reconocer el comportamiento de el \textbf{HP} con respecto a las mismas.
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=1,scale=.5]{plots.pdf}
+% %   \caption{Gr\'afico de caja}
+% %   \label{plot:do}
+% % \end{figure}
+% % En las figura \ref{plot:s_hp_de} podemos ver una ligera relaci\'on positiva entre ambas el \textbf{HP} y la \textbf{Defensa Especial}, aunque no deja de parecer ruido en lugar de una variable significativa. Por otro lado en la figura \ref{plot:s_hp_v} no podemos idetificar una relaci\'on clara de la \textbf{Velocidad} con respecto de la variable respuesta. 
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=2,scale=.5]{plots.pdf}
+% %   \caption{HP vs Defensa Especial}
+% %   \label{plot:s_hp_de}
+% % \end{figure}
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=3,scale=.5]{plots.pdf}
+% %   \caption{HP vs Velocidad}
+% %   \label{plot:s_hp_v}
+% % \end{figure}
+% % Por otro lado el \textbf{Progreso Evolutivo}, \ref{plot:s_hp_pe}, parece m\'as bien una variable categ\'orica por la forma en que se construy\'o, pero dejando esto de lado podemos ver que hay ligero incremento con respecto al valor medio del \textbf{HP} en función del \textit{Progreso Evolutivo}.
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=4,scale=.5]{plots.pdf}
+% %   \caption{HP vs Progeso Evolutivo}
+% %   \label{plot:s_hp_pe}
+% % \end{figure}
+% % Los comportamientos de las otras variables es bastante similar, son muy err\'aticos y no parecen revelar estructura alguna a plena vista. Como se puede observar en las figuras \ref{plot:s_hp_a}, \ref{plot:s_hp_d}, \ref{plot:s_hp_ae}.
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=5,scale=.5]{plots.pdf}
+% %   \caption{HP vs Ataque}
+% %   \label{plot:s_hp_a}
+% % \end{figure}
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=6,scale=.5]{plots.pdf}
+% %   \caption{HP vs Defensa}
+% %   \label{plot:s_hp_d}
+% % \end{figure}
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=7,scale=.5]{plots.pdf}
+% %   \caption{HP vs Ataque Especial}
+% %   \label{plot:s_hp_ae}
+% % \end{figure}
+% % subsection analisis_exploratorio (end)
+% \subsection*{Selecci\'on de Variables} % (fold)
+% \label{sub:seleccion_de_variables}
+% Para escoger las variables se utiliz\'o la metodolog\'ia todas las posibles regresiones de donde conseguimos la siguinete tabla
+% \begin{table}[H]
+%   \centering
+%   \begin{tabular}{|c|c|c|c|c|c|} 
+%   \hline
+%   N\'umero de Variables&Variables &R &R-ajustada & $S^2$ &CP\\
+%   \hline
+%   % \rowcolor[rgb]{1, .9, .4}
+% 1 & Def. Esp. & .25  & .24  & 626  & 39.5\\
+% \hline
+% % \rowcolor[rgb]{1, .9, .4}
+% 2 & Def. Esp., Vel. & .32  &.31  &573  &23.3\\
+% \hline
+% % \rowcolor[rgb]{1, .9, .4}
+% 3 & Def. Esp., Vel., Ev. Prog.  &.4  &.38 &521  &8.1\\
+% \hline
+% % \rowcolor[rgb]{1, .9, .4}
+% 4 & Def. Esp., Vel., Ev. Prog., Def. &.4  &.39  &515 &6.4\\
+% \hline
+% % \rowcolor[rgb]{1, .9, .4}
+% 5 & Def. Esp., Vel., Ev. Prog., Def., F. F. &.41  &.39  &514  &5.9\\
+% \hline
+% 6 & Def. Esp., Vel., Ev. Prog., Def., F. F., At. &.42  &.4  &516  &6.5\\
+% \hline
+% 7 & Def. Esp., Vel., Ev. Prog., Def., F. F., At. Esp. &.42  &.4  &521  &8\\
+% \hline
+%   \end{tabular}
+%   % \rowcolor[rgb]{1, .9, .4}
+%   \caption{Resumen de Todas las posibles regresiones}
+%   \label{tab:TPR}
+% \end{table}
+% De la tabla \ref{tab:TPR} notamos que a partir del 3er modelo que incluye \textbf{Defensa Especial}, \textbf{Velocidad} y el \textbf{Progreso Evolutivo}, el resto de los modelos aporta muy poco a la $R^2$ ajustada, $s^2$ (suma de los residuales), de modo que escogemos este modelo por parsimonia. Notese que el 4to modelo incluye la \textbf{Defensa}, despu\'es hablaremos de esto.
+% % subsection seleccion_de_variables (end)
+% \subsection*{Ajustando el Modelo} % (fold)
+% \label{sub:ajustando_el_modelo}
+% Ajustamos un modelo de regresi\'on simple con las 3 variables seleccionadas, \textbf{Defense Especial}, \textbf{Velocidad} y \textbf{Progreso Evolutivo} obteniendo los siguientes resultados
+% \begin{table}[H]
+%   \centering
+%   \begin{tabular}{|c|c|c|c|c|} 
+%   \hline
+%   Coeficientes & Estimaci\'on& Inferior & Superior  \\
+%   \hline
+%   $\beta_0$ & 30.03 &18.05 & 42\\
+%   \hline
+%   Def. Esp & .4429 & .2447 &.6411\\
+%   \hline
+%   Vel. & -0.3713 & -0.5149 & -0.2278  \\
+%   \hline
+%   Prog. Ev. & 41.36& 21.35 & 61.36  \\
+%   \hline
+%   \end{tabular}
+%   \caption{Resultados regresi\'on}
+%   \label{tab:reg}
+% \end{table}
+% Con respecto a la tabla \ref{tab:reg} podemos decir lo siguiente, las pruebas $t$ individuales de cada coeficiente arrojaron valores $p$ del orden $10^{-5}$, o m\'as chicos, de modo que todos los coeficientes son estad\'isticamente distintos de 0, adicionalmente recordemos la $R^2=.4$ para este modelo (v\'ease tabla \ref{tab:TPR}). Finalmente, la prueba $F$ para toda la regresi\'on arrojo un valor $p$ del orden $10^{-16}$, as\'i podemos decir los regresores guardan informaci\'on relevante a la variable respuesta \textbf{HP}.\\
+
+% \subsubsection*{ANOVA} % (fold)
+% \label{ssub:anova}
+% Procedemos a realizar el an\'alisis de varianza para reconocer si cada variable es relevante para el modelo.
+% $$ $$
+% $$ $$
+% $$ $$
+% \begin{table}[H]
+%   \centering
+%   \begin{tabular}{|c|c|c|c|c|c|} 
+%   \hline
+% Variable & GL & SS & MSS & valorF&Valor p\\
+% \hline
+% Def. Esp& 1 &30591& 30591& 60.28&  1.28$\times 10^{-12}$\\
+% \hline
+% Vel.&1&8990&8990 &17.71 &4.44$\times 10^{-5}$ \\
+% \hline
+% Prog. Ev.&8469 &8469 & 16.7 & 30.552 &7.2$\times 10^{-5}$\\                                                 
+% \hline
+% Residuales&147 & 74589  & 507.4\\
+% \hline
+% \end{tabular}
+% \caption{Anova}
+%   \label{tab:an}
+% \end{table}
+% La tabla \ref{tab:an} presenta las sumas de cuadrados secuenciales para nuestra regresi\'on, en el orden de importancia o significancia, observando los valores p nos damos cuenta de que cada todas las variables son significativas, por lo mismo no excluimos ninguna.
+% % subsubsection anova (end)
+% \subsubsection*{An\'alisis de los supuestos de la regresi\'on} % (fold)
+% \label{ssub:analisis_de_los_supuestos_de_la_regresion}
+% El an\'alisis de regresi\'on que estamos realizando parte de 3 supuestos
+% \begin{itemize}
+% 	\item $\mathbb{E}[\epsilon_i]=0$ y $Var[\epsilon_i]=\sigma^2$
+% 	\item $Cov(\epsilon_i, \epsilon_j)=0$ para $i\neq j$
+% 	\item $\epsilon_i$ se distribuye Normal$(0, \sigma^2)$
+% \end{itemize}
+% Ahora bien, la primera parte del primer supuesto se cumple si se incluye la constante (intercepto) $\beta_0$, obtenido por m\'inimos cuadrados, al modelo. Para analizar la segunda parte y el segundo supuesto utilizaremos herramientas gr\'aficas, la comparaci\'on de residuales contra valores ajustados y regresores.
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=8,scale=.5]{plots.pdf}
+% %   \caption{Residuales vs $\hat{Y_i}$}
+% %   \label{plot:res_ajus}
+% % \end{figure}
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=9,scale=.5]{plots.pdf}
+% %   \caption{Residuales vs Defensa Especial}
+% %   \label{plot:res_de}
+% % \end{figure}
+% % En la figura \ref{plot:res_ajus} la forma de la nube de puntos puede indicar que hay mayor varianza para valores mayores de $\hat{Y_i}$ por otro lado tanto la \textbf{Defensa Especial} como \textbf{Velocidad}, presentan una forma convexa, quiz\'a sea prudente agregar alg\'un t\'ermino cuadr\'atico a la regresi\'on. La interpretaci\'on los residuales contra el progreso evolutivo, es m\'as complicado, sin embargo, considerando que los grupos tienen distintos tama\~nos, los Pok\'emon en etapa final presentan mayor variaci\'on. Cabe mencionar que en todas las figuras se elimin\'o la observaci\'on 113, debido que era un outlier en todos los casos y no permit\'ia observar claramente la estructura de los residuales.
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=10,scale=.5]{plots.pdf}
+% %   \caption{Residuales vs Velocidad}
+% %   \label{plot:res_v}
+% % \end{figure}
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=11,scale=.5]{plots.pdf}
+% %   \caption{Residuales vs Progreso Evolutivo}
+% %   \label{plot:res_pg}
+% % \end{figure}
+% % subsubsection analisis_de_los_supuestos_de_la_regresion (end)
+% % subsection ajustando_el_modelo (end)
+% \subsection*{Estabilizando varianza} % (fold)
+% \label{sub:estabilizando_varianza}
+% Para estabilizar la varianza se utilizo un an\'alisis de Box-Cox de donde nuestr\'a $\lambda$ \'optima fue $0$ indicando que se debe aplicar la transformaci\'on logaritmo sobre la variable respuesta \textbf{HP}.\\
+
+% Esto mejor\'o ligeramente la corelaci\'on con los regresores, .54 para la defensa especial, .019 para la velocidad, y .57 para el progreso evolutivo.
+% \subsubsection*{Reajustando el modelo} % (fold)
+% \label{ssub:reajustando_el_modelo}
+% Al ajustar la regresi\'on con la tranformaci\'on utilizada obtenemos
+% \begin{table}[H]
+%   \centering
+%   \begin{tabular}{|c|c|c|c|c|} 
+%   \hline
+%   Coeficientes & Estimaci\'on& Inferior & Superior  \\
+%   \hline
+%   $\beta_0$ & 3.474 &3.311 & 3.637\\
+%   \hline
+%   Def. Esp & .006 & .0033 &.0087\\
+%   \hline
+%   Vel. & -0.0053 & -0.0073 & -0.0034  \\
+%   \hline
+%   Prog. Ev. & .51& .51 & 1.055  \\
+%   \hline
+%   \end{tabular}
+%   \caption{Resultados regresi\'on}
+%   \label{tab:reg2}
+% \end{table}
+% \begin{table}[H]
+%   \centering
+%   \begin{tabular}{|c|c|c|c|c|c|} 
+%   \hline
+% Variable & GL & SS & MSS & valor F&Valor p\\
+% \hline
+% Def. Esp& 1 &7.92& 7.92& 83.96&  4.07$\times 10^{-16}$\\
+% \hline
+% Vel.&1&1.61&1.61 &17.08 &6$\times 10^{-5}$ \\
+% \hline
+% Prog. Ev.&1 &3.03 & 3.03 & 32.12 &7.4$\times 10^{-8}$\\                                                 
+% \hline
+% Residuales&147 & 13.88  & .0944\\
+% \hline
+% \end{tabular}
+% \caption{Anova}
+%   \label{tab:an2}
+% \end{table}
+
+% Tanto para las pruebas t individuales del cuadro \ref{tab:reg2} como para el ANOVA, cuadro \ref{tab:an2}, los valores $p$ son muy chicos, indicando que los coeficientes son estad\'isticamente distintos de 0 y que cada variable explica una parte relevante del modelo. En este caso la $R^2=.47$ mejor\'o ligeramente.
+% % subsubsection reajustando_el_modelo (end)
+% \subsubsection*{An\'alisis de residuales despu\'es de estabilizar varianza} % (fold)
+% \label{ssub:analisis_de_residuales_despues_de_estabilizar_varianza}
+% Ahora procedemos a reanalizar los residuales
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=12,scale=.5]{plots.pdf}
+% %   \caption{Residuales (est.) vs $\hat{Y_i}$}
+% %   \label{plot:res_ajus_e}
+% % \end{figure}
+% % En el caso de los valores ajustados, figura \ref{plot:res_ajus_e} notamos una mejor\'ia, aunque aparece una ligera forma concava, la varianza ya parece constante. Del mismo modo la relaci\'on entre residuales y \textbf{Defensa Especial} parece se algo convexa, pero la forma es muy ligera, y fuera de eso la varianza parece constante.
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=13,scale=.5]{plots.pdf}
+% %   \caption{Residuales (est.) vs Defensa Especial}
+% %   \label{plot:res_de_e}
+% % \end{figure}
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=14,scale=.5]{plots.pdf}
+% %   \caption{Residuales (est.) vs Velocidad}
+% %   \label{plot:res_v_e}
+% % \end{figure}
+% % La \textbf{Velocidad} contra los residuales, figura \ref{plot:res_v_e} tambi\'en parece tener una ligera convexidad, y una reducci\'on de varianza a mayor velocidad. En una nota aparte, se prob\'o un modelo con un t\'ermino cuadr\'arico de \textbf{Velocidad}, y aunque era significativo, no se considero por no contribuir mucho sobre la $R^2$.
+% % \begin{figure}[H]
+% %   \centering
+% %     \includegraphics[page=15,scale=.5]{plots.pdf}
+% %   \caption{Residuales (est.) vs Progreso Evolutivo}
+% %   \label{plot:res_pg_e}
+% % \end{figure}
+% Finalmente, con respecto al \textbf{Progreso Evolutivo} tenemos el mismo problema de an\'alisis, pero parece que la varianza se redujo a en cada nivel de progreso evolutivo, quiz\'a de un modo que estabiliza la varianza.
+% % subsubsection analisis_de_residuales_despues_de_estabilizar_varianza (end)
+% % subsection estabilizando_varianza (end)
+% % section resultados (end)
+% \section*{Interpretando el modelo} % (fold)
+% \label{sec:interpretando_el_modelo}
+% Primero retomemos lo dicho en secciones anteriores, el modelo con la transformaci\'on logaritmo sobre la respuesta ofrece mejores resultados sobre los supuestos de los residuales. Adicionalemente, es un poco m\'as congruente con la mec\'anica del juego, por que no puede haber valores negativos para \textbf{HP}, que en el caso del primer modelo se podr\'ia obtener con grandes valores en la variable \textbf{Velocidad}, n\'otese en la tabla \ref{tab:reg} que el coeficiente es negativo.\\
+
+% Aunque en el segundo caso tambi\'en el coeficiente de \textbf{Velocidad} es negativo, el modelo que obtenemos es el siguiente
+% $$Y = e^{3.474+.006 \mathit{Def. Esp} -0.0053\mathit{Vel.}+.51\mathit{Prog. Ev.}+\epsilon}$$
+% Ahora bien, este modelo es dif\'icil de comprender sino se conocen las mec\'anicas de Pok\'emon, primero consideremos los signos de los coeficientes. La raz\'on por la que la \textbf{Defensa Especial} tiene un valor alto es por una estrategia com\'un conocida como \textit{Tanque} un Pok\'emon con gran resistencia, y duraci\'on durante una batalla. Por eso mismo mencionabamos que en la tabla \ref{tab:TPR} el cuarto modelo incluye la \textbf{Defensa} pues un buen tanque incluye valores altos en estos 3 stats.\\
+
+% Por otro lado la \textbf{Velocidad} tiene un signo negativo por la misma estrategia, un Tanque esta basado en recibir golpes y soportar largos combates haciendo uso de movimientos de da\~no indirecto. De modo que los Tanques, como se esperar\'ia con ese nombre, son lentos y nunca atacan primero.\\
+
+% Finalmente el \textbf{Progreso Evolutivo} tiene relevancia y signo positivo por la forma en que trabaja la mec\'anica, cuanod un Pok\'emon \textit{evoluciona} sus stats suben, algunos m\'as que otros, e inclusive comienza a tener saltos mayores en cada nivel. Claro uno esperar\'ia que una forma final tenga mejores stats que sus pre-voluciones, como se les llama en la comunidad de jugadores.\\
+
+% Ahora bien una explicaci\'on de poque el \textbf{Ataque} y el \textbf{Ataque Especial} no parecen ser tan significativos, primeor esto se debe que existen varias subestrategias con Tanques, algunos poseen habilidades ofensivas y otros nos.'
+
+% % section interpretando_el_modelo (end)
+% \section*{Conclusiones} % (fold)
+% \label{sec:conclusiones}
+% \begin{itemize}
+% 	\item Primero el juego de Pok\'emon parece guardar alguna l\'ogica, es decir, no se deciden de manera completamente aleatoria los stats de cada Pok\'emon, sino que se escogen con intenci\'on.
+% 	\item En Pok\'emon existen muchas m\'as mec\'anicas que pueden ser utilizadas para el an\'alisis de regresi\'on, sin embargo algunas no son observables para el jugador, o son variables con muchas categor\'ias de modo que obtendr\'iamos un modelo poco parsimonioso, este es el caso de los \textit{Tipos} (fuego, agua, hierba), una de las mec\'anicas m\'as populares de Pok\'emon que sigue reglas similares al juego Piedra-Pael-Tijera.
+% 	\item En este caso nuestro modelo separar a los Pok\'emon en 2 grupos los Tanques y el resto, sin embargo, es posible que esto se deba a que se utiliz\'o los 151 originales, que contiene a muchos Pok\'emon de tipo normal con valores altos de \textbf{HP} incluyendo a \textit{Snorlax, Chansey}, ya que existen mucho otros Pok\'emon.
+% \end{itemize}
+% % section conclusiones (end)
+\bibliography{Tar}{}
+\bibliographystyle{apacite}
+\end{document}
