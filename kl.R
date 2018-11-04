@@ -267,6 +267,8 @@ distancias_series<-function(series) {
 	return(t(distancias))
 }
 
+
+
 # distanc <- as.dist(distancias(periodogramas))
 # print(distanc)
 
@@ -309,31 +311,18 @@ promedio_espectro <- function(clase) {
 
 
 
-clase_ar<- gen_mulp_ar(100, 1000,1,.1, .5, -.1, .1, .1)
-espectro_clase_ar<- t(apply(clase_ar, 1, funcion_densidad_espectral_periodograma_priestley))
-# str(clase_ar)
-# str(espectro_clase_ar)
-# funcion_densidad_espectral_periodograma_priestley(clase_ar[1,])
-espectro_prom_ar<-promedio_espectro(espectro_clase_ar)
-# plot(espectro_ma)
+# clase_ar<- gen_mulp_ar(100, 1000,1,.1, .5, -.1, .1, .1)
+# espectro_clase_ar<- t(apply(clase_ar, 1, funcion_densidad_espectral_periodograma_priestley))
+
+# espectro_prom_ar<-promedio_espectro(espectro_clase_ar)
 
 
-clase_ma<-gen_mulp_ma(100, 1000,1,.1, .5, -.1, -.2)
-espectro_clase_ma<- t(apply(clase_ma, 1, funcion_densidad_espectral_periodograma_priestley))
-espectro_prom_ma<-promedio_espectro(espectro_clase_ma)
-# abs(espectro_prom_ma)
-# kl_divergence(abs(espectro_prom_ma), abs(espectro_clase_ma[2,]))
-# kl_divergence(abs(espectro_prom_ar), abs(espectro_clase_ma[2,]))
-# kl_divergence(abs(espectro_prom_ma), abs(espectro_clase_ma[3,]))
-# kl_divergence(abs(espectro_prom_ar), abs(espectro_clase_ma[3,]))
-# kl_divergence(abs(espectro_prom_ma), abs(espectro_clase_ma[4,]))
-# kl_divergence(abs(espectro_prom_ar), abs(espectro_clase_ma[5,]))
-# kl_divergence(abs(espectro_prom_ma), abs(espectro_clase_ma[6,]))
-# kl_divergence(abs(espectro_prom_ar), abs(espectro_clase_ma[6,]))
-# kl_divergence(abs(espectro_prom_ma), abs(espectro_clase_ma[7,]))
-# kl_divergence(abs(espectro_prom_ar), abs(espectro_clase_ma[7,]))
 
-entrenamiento<- rbind(espectro_clase_ar, espectro_clase_ma)
+# clase_ma<-gen_mulp_ma(100, 1000,1,.1, .5, -.1, -.2)
+# espectro_clase_ma<- t(apply(clase_ma, 1, funcion_densidad_espectral_periodograma_priestley))
+# espectro_prom_ma<-promedio_espectro(espectro_clase_ma)
+
+# entrenamiento<- rbind(espectro_clase_ar, espectro_clase_ma)
 
 clasificar<- function(espectro_series, espectro_1, espectro_2) {
 	n<- nrow(espectro_series)
@@ -348,15 +337,14 @@ clasificar<- function(espectro_series, espectro_1, espectro_2) {
 	return(clase_asignanda)
 }
 
-# clasi
-# clasificar(entrenamiento, espectro_prom_ar, espectro_prom_ma)
-clasificacion<- clasificar(entrenamiento, espectro_prom_ar, espectro_prom_ma)
-clasi <- data.frame(clasificacion, c(rep(1, 100), rep(2, 100)))
-confusion<- matrix(0,nrow = 2, ncol = 2)
-for (i in 1:200) {
-	confusion[clasi[i, 2], clasi[i, 1]]<-confusion[clasi[i, 2], clasi[i, 1]]+1
-}
-confusion
+
+# clasificacion<- clasificar(entrenamiento, espectro_prom_ar, espectro_prom_ma)
+# clasi <- data.frame(clasificacion, c(rep(1, 100), rep(2, 100)))
+# confusion<- matrix(0,nrow = 2, ncol = 2)
+# for (i in 1:200) {
+# 	confusion[clasi[i, 2], clasi[i, 1]]<-confusion[clasi[i, 2], clasi[i, 1]]+1
+# }
+# confusion
 
 gen_clase_ar_al<-function(max.par=1, n.series=1,n.observaciones=1, varianza=1) {
 	ars<- matrix(NA, nrow = n.series, ncol = n.observaciones)
@@ -381,27 +369,21 @@ espectro_clase<- function(clase) {
 espectro_clase<- t(apply(clase, 1, funcion_densidad_espectral_periodograma_priestley))
 return(espectro_clase)
 }
-clase_ar_genera<- gen_clase_ar_al(5, 100, 100)
-clase_ma_genera<- gen_clase_ma_al(5, 100, 100)
-espectro_ar<-espectro_clase(clase_ar_genera)
-espectro_ma<-espectro_clase(clase_ma_genera)
-espectro_prom_ma<-colMeans(espectro_ma)
-espectro_prom_ar<-colMeans(espectro_ar)
-entrenamiento<-rbind(espectro_ar, espectro_ma)
-clasificacion<- clasificar(entrenamiento, espectro_prom_ar, espectro_prom_ma)
-clasi <- data.frame(clasificacion, c(rep(1, 100), rep(2, 100)))
-	confusion<- matrix(0,nrow = 2, ncol = 2)
-for (i in 1:200) {
-	confusion[clasi[i, 2], clasi[i, 1]]<-confusion[clasi[i, 2], clasi[i, 1]]+1
-}
-confusion
-# confusion<-function(entrenamiento, espectro_prom_ar, espectro_prom_ma) {
-	
+# clase_ar_genera<- gen_clase_ar_al(5, 100, 100)
+# clase_ma_genera<- gen_clase_ma_al(5, 100, 100)
+# espectro_ar<-espectro_clase(clase_ar_genera)
+# espectro_ma<-espectro_clase(clase_ma_genera)
+# espectro_prom_ma<-colMeans(espectro_ma)
+# espectro_prom_ar<-colMeans(espectro_ar)
+# entrenamiento<-rbind(espectro_ar, espectro_ma)
+# clasificacion<- clasificar(entrenamiento, espectro_prom_ar, espectro_prom_ma)
+# clasi <- data.frame(clasificacion, c(rep(1, 100), rep(2, 100)))
+# 	confusion<- matrix(0,nrow = 2, ncol = 2)
+# for (i in 1:200) {
+# 	confusion[clasi[i, 2], clasi[i, 1]]<-confusion[clasi[i, 2], clasi[i, 1]]+1
 # }
+# confusion
 
-# clasificador<-function(clase.1, clase.2) {
-# 	espectro_clase
-# }
 
 
 
@@ -720,3 +702,73 @@ clasify3_umbral<-function(series, centers, classes, umbral=0, is.spectrum=F) {
 	return(class)
 }
 
+
+
+
+
+distancias_series<-function(series, duraciones, fre=1) {
+	duracion_min<- min(duraciones)
+	porcentajes<-duracion_min/duraciones
+	n<-length(series)
+	periodogramas<-espectro_clase_promedio(series, duraciones, porcentajes, fre)
+	
+	# str(unlist(periodogramas[1]))
+	distancias<- matrix(data=0.0, nrow = n, ncol = n)
+	for (i in 1:(n-1)) {
+		for (j in (i+1):n) {
+			# distancias[i,j] <- j_divergence(periodogramas[i], periodogramas[j])
+			# distancias[i,j]<-j_divergence(abs(periodogramas[i,]), abs(periodogramas[j,]))
+			# print("ok2")
+			distancias[i,j]<-kl.dist(periodogramas[i,],periodogramas[j,])$D
+		}
+	}
+	return(t(distancias))
+}
+
+
+# kmeans
+within_sum_squares<-function(series, centro) {
+	suma<-0
+	for(i in 1:nrow(series)){
+		suma<-suma+kl.dist(centro,series[i,])$D
+	}
+	return(suma)
+}
+
+
+kmeans_ts<- function(series, duraciones, k=1, series_names=NA, fre=1, iteraciones=1) {
+	duracion_min<- min(duraciones)
+	porcentajes<-duracion_min/duraciones
+	todos.espectros<-espectro_clase_promedio(series, duraciones, porcentajes,fre)
+	# print(str(todos.espectros))
+	# i<-1
+	centros.t<-list()
+	clases.t<-list()
+	wihtin.ss<-numeric(iteraciones)
+	for (i in 1:iteraciones) {
+	centers<- todos.espectros[sample(1:length(duraciones),k),]
+	
+	clases.v<-clasify5(todos.espectros, centers, 1:k,T)
+	print(i)
+	while(1){
+		# i<-i+1
+		for (j in 1:k) {
+			centers[j,]<-colMeans(todos.espectros[clases.v==j,])
+		}
+
+		clases.n<-clasify5(todos.espectros, centers, 1:k,T)
+		# print(sum(clases.v==clases.n))
+		if(all(clases.v==clases.n)){
+			break
+		}
+		clases.v<-clases.n
+	}
+	for (s in 1:k) {
+			wihtin.ss[i]<-wihtin.ss[s]+within_sum_squares(todos.espectros[clases.v==s,],centers[s,])
+		}
+	# print(which.max(wihtin.ss))
+	clases.t[[i]]<- clases.v
+	centros.t[[i]]<-centers
+	}
+	return(list(centros=centros.t, ultimac=clases.t, wss=wihtin.ss))
+}
