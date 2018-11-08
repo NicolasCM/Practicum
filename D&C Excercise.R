@@ -291,6 +291,29 @@ objeto <- list("Umbral"=umbrales[which.min(tasa_error)], "Tasa"=tasa_error[which
 return(objeto)	
 }
 
+
+mejor_umbral_minimax<-function(spectrums, centers, t_classes, from=0, to=1, by=1) {
+classes_u<- unique(t_classes)
+positive<- sum(t_classes==classes_u[1])
+negative<- sum(t_classes==classes_u[2])
+total<- length(t_classes)
+umbrales<- seq(from, to, by)
+n<-length(umbrales)
+tasa_error<-numeric(n)
+sens<-numeric(n)
+spec<-numeric(n)
+for (i in 1:n) {
+	clasificacion_aux<-clasify3_umbral(spectrums, centers,classes_u, umbrales[i], T)
+	matriz_conf<-confusion_matrix(t_classes, clasificacion_aux)
+	sens[i]<-matriz_conf[1,1]/(matriz_conf[1,1]+ matriz_conf[1,2])
+	spec[i]<-matriz_conf[2,2]/(matriz_conf[2,1]+ matriz_conf[2,2])
+	tasa_error[i]<-abs(sens[i]-spec[i])
+	# roc[i,1]<-1-matriz_conf[2,2]/negative
+	# roc[i,2]<-matriz_conf[1,1]/positive
+}
+objeto <- list("Umbral"=umbrales[which.min(tasa_error)], "Tasa"=tasa_error[which.min(tasa_error)], "Sensibilidad"=sens, "Especificidad"=spec)
+return(objeto)	
+}
 # mej_umb <- mejor_umbral(g.vs.p$spectrums, g.vs.p$centers, clase_entrenamiento, -5, 5, .1)
 # clasificacion_entrenamiento_m<-clasify3_umbral(g.vs.p$spectrums, g.vs.p$centers,c("cat", "dog"), mej_umb$Umbral, T)
 # matriz_conf_entrenamiento_m<-confusion_matrix(clase_entrenamiento, clasificacion_entrenamiento_m)
@@ -321,7 +344,8 @@ g.vs.p<-classification_problem_promedio(todas.waves[indicador],
 g.vs.p$confusion_mat
 (g.vs.p$confusion_mat[2,1]+g.vs.p$confusion_mat[1,2])/sum(g.vs.p$confusion_mat)
 
-best_umb<- mejor_umbral(g.vs.p$spectrums, g.vs.p$centers, clase_entrenamiento, -5, 5, .1)
+# best_umb<- mejor_umbral(g.vs.p$spectrums, g.vs.p$centers, clase_entrenamiento, -5, 5, .1)
+best_umb<- mejor_umbral_minimax(g.vs.p$spectrums, g.vs.p$centers, clase_entrenamiento, -5, 5, .1)
 str(g.vs.p$centers)
 clasificacion_entrenamiento_m<-clasify3_umbral(g.vs.p$spectrums, g.vs.p$centers,c("cat", "dog"), best_umb$Umbral, T)
 matriz_conf_entrenamiento_m<-confusion_matrix(clase_entrenamiento, clasificacion_entrenamiento_m)
@@ -499,24 +523,63 @@ abline(0,1)
 plot(dendrogramas1)
 plot(dendrogramas2)
 plot(dendrogramas3)
-plot(espectro_promedio_congo[[1]], type="l",xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[4])
-plot(espectro_promedio_congo[[2]], type="l",xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[2])
-plot(espectro_promedio_congo[[3]], type="l", xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[3])
-plot(usa, type="l", xlab="Frecuencia", ylab="")
-plot(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l", xlab="Frecuencia", ylab="", col="#a4093a")
-plot(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l", xlab="Frecuencia", ylab="", col="#01bcf0")
-plot(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l", xlab="Frecuencia", ylab="", col="#a4093a")
-lines(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l", col="#01bcf0")
+plot(prs[,1],espectro_promedio_congo[[1]], type="l",xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[4])
+plot(prs[,1],espectro_promedio_congo[[2]], type="l",xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[2])
+plot(prs[,1],espectro_promedio_congo[[3]], type="l", xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[3])
+plot(prs[,1],usa, type="l", xlab="Frecuencia", ylab="")
+plot(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l", xlab="Frecuencia", ylab="", col="#a4093a")
+plot(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l", xlab="Frecuencia", ylab="", col="#01bcf0")
+plot(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l", xlab="Frecuencia", ylab="", col="#a4093a")
+lines(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l", col="#01bcf0")
 dev.off()
-colorres2<-c(rep("#a4093a", 164),rep("#01bcf0",113))
+# colorres2<-c(rep("#a4093a", 164),rep("#01bcf0",113))
 
-plot(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l")
-plot(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l")
+# plot(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l")
+# plot(clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l")
 # Resultados conglomerados jerarquicos
 # pdf("Resultados_F4.pdf")
 
+pdf("Resultados_F1_2.pdf")
+par(bg="#09333e", col="#d9d9d9", col.axis="#d9d9d9", col.lab="#d9d9d9", col.main="#d9d9d9", col.sub="#d9d9d9")
+plot(todas.waves[["cat_75.wav"]], xlab="Tiempo", ylab="db",col="#d9d9d9")
+plot(todas.waves[["dog_barking_101.wav"]], xlab="Tiempo", ylab="db", col="#d9d9d9")
+spectro(todas.waves[["cat_75.wav"]], f=16000, tlab="Tiempo", flab="Frecuencia(kHz)",scalelab = "Amplitud\n(dB)",
+	colbg="#09333e",  colaxis="#d9d9d9", collab="#d9d9d9")
+spectro(todas.waves[["dog_barking_101.wav"]], f=16000, tlab="Tiempo", flab="Frecuencia(kHz)", scalelab = "Amplitud\n(dB)",
+	colbg="#09333e",  colaxis="#d9d9d9", collab="#d9d9d9")
+dev.off()
+
+pdf("Resultados_F2_2.pdf")
+par(bg="#09333e", col="#d9d9d9", col.axis="#d9d9d9", col.lab="#d9d9d9", col.main="#d9d9d9", col.sub="#d9d9d9")
+plot(prs[,1],g.vs.p$centers[1,], type="l", xlab="Frecuencia", ylab="", col="#a4093a")
+plot(prs[,1],g.vs.p$centers[2,], type="l", xlab="Frecuencia", ylab="", col="#01bcf0")
+dev.off()
+
+pdf("Resultados_F3_2.pdf")
+par(bg="#09333e", col="#d9d9d9", col.axis="#d9d9d9", col.lab="#d9d9d9", col.main="#d9d9d9", col.sub="#d9d9d9")
+plot(roca_entrenamiento, type="l", xlab="1-especificidad", ylab="Sensibilidad")
+abline(0,1)
+plot(roca_prueba, type="l", xlab="1-especificidad", ylab="Sensibilidad")
+abline(0,1)
+plot(dendrogramas1)
+plot(dendrogramas2)
+plot(dendrogramas3)
+plot(prs[,1],espectro_promedio_congo[[1]], type="l",xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[4])
+plot(prs[,1],espectro_promedio_congo[[2]], type="l",xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[2])
+plot(prs[,1],espectro_promedio_congo[[3]], type="l", xlab="Frecuencia", ylab="", col=unique(get_leaves_branches_col(dendrogramas2))[3])
+plot(prs[,1],usa, type="l", xlab="Frecuencia", ylab="")
+plot(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l", xlab="Frecuencia", ylab="", col="#a4093a")
+plot(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l", xlab="Frecuencia", ylab="", col="#01bcf0")
+plot(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][1,], type="l", xlab="Frecuencia", ylab="", col="#a4093a")
+lines(prs[,1],clases.kmeans$centros[[which.min(clases.kmeans$wss)]][2,], type="l", col="#01bcf0")
+dev.off()
+plot()
+str(best_umb)
+plot(best_umb$Sensibilidad, type="l")
+lines(best_umb$Especificidad, type="l")
 AUC_entrenamiento
 AUC_prueba
 
 
-
+# best_umb<- mejor_umbral_minimax(g.vs.p$spectrums, g.vs.p$centers, clase_entrenamiento, -5, 5, .1)
+# str(best_umb)

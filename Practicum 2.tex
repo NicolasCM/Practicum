@@ -102,12 +102,11 @@
 \maketitle 
 \section*{Introducci\'on} % (fold)
 \label{sec:introduccion}
-En este practicum queremos mostrar el uso de la densidad espectral para clasificar series de tiempo, algunas de las razones que impulsaron está idea fueron: primero, algunos ejemplos, particularmente la clasificación de temblores basada en esta misma metodología\cite{SUBJ_SP1}\cite{SUBJ_SP2}, en el caso de Shumway como un medio para monitorear que se respeten las reglas internacionales de pruebas nucleares. Tambi\'en tenemos el caso de la clasificaci\'on de flamas seg\'un el sonido generado en la combusti\'on.\cite{SUBJ_SP3}\\
+En este practicum queremos mostrar el uso de la densidad espectral para clasificar series de tiempo, algunas de las razones que impulsaron está idea fueron: primero, algunos ejemplos, particularmente la clasificación de temblores basada en esta misma metodología\cite{SUBJ_SP1}\cite{SUBJ_SP2}, en el caso de Shumway como un medio para monitorear que se respeten las reglas internacionales de pruebas nucleares. Tambi\'en tenemos el caso de la clasificaci\'on de flamas seg\'un el sonido generado en la combusti\'on.\cite{SUBJ_SP3}. El posible uso para crear listas de reproducci\'on autom\'aticas.\\
 
 La primera parte del texto consiste en un ejemplo de la clasificaci\'on de audios de perros y gatos que forma parte de una base de datos de 48 clases ac\'usticas adicionales, utilizada en un art\'iculo sobre redes neuronales \cite{DATOS}.\\
 
-La base utilizada consta de 164 archivos WAV con sonidos de gatos, maullidos, ronroneos, o similares y 113 sonidos de perros, ladridos principalmente. Decidimos seguir el ejercio propuesto en el sitio Kaggle\cite{DATOS2}, donde se propone dividir la muestra en conjunto de entranamiento con 115 archivos de gatos y 64 de perros, los 49 restantes de cada categor\'ia se asignan al conjunto de prueba. Ambos se presentan en las tablas 
-% \ref{tbl:conjunto_entre_gato}, \ref{tbl:conjunto_prueba_perro}, \ref{tbl:conjunto_prueba_gato}, \ref{tbl:conjunto_prueba_perro}\\
+La base utilizada consta de 164 archivos WAV con sonidos de gatos, maullidos, ronroneos, o similares y 113 sonidos de perros, ladridos principalmente. Decidimos seguir el ejercio propuesto en el sitio Kaggle\cite{DATOS2}, donde se propone dividir la muestra en conjunto de entranamiento con 115 archivos de gatos y 64 de perros, los 49 restantes de cada categor\'ia se asignan al conjunto de prueba. Ambos se presentan en las tablas \ref{tbl:conjunto_entre_gato}, \ref{tbl:conjunto_entre_perro}, \ref{tbl:conjunto_prueba_gato}, \ref{tbl:conjunto_prueba_perro}\\
 
 Los resultados preliminares son bastante satisfactorios, tasa de error del $15\%$, $16\%$, curva roc del $93\%$, y notamos que el espectro de maullidos es muy distinto de ladridos en t\'erminos de duraci\'on y harmon\'ia.\\
 
@@ -150,13 +149,12 @@ Hay m\'ultiples art\'iculos sobre an\'alisis de conglomerados, y algunos de ello
 
 \section*{Como perros y gatos} % (fold)
 \label{sec:como_perros_y_gatos}
-Como dijimos nos centramos en 2 ejemplos, el primero consiste en crear una regla de clasificaci\'on de los sonidos de perros y gatos, y el segundo es realizar un an\'alisis de conglomerados sobre la misma muestra, en ambos casos damos consideramos los audios como series de tiempo y les damos un tratamiento espectral, de modo que podamos aplicar la divergencia K-L sobre las densidades espectrales.
+Como dijimos nos centramos en 2 ejemplos, el primero consiste en crear una regla de clasificaci\'on de los sonidos de perros y gatos, y el segundo es realizar un an\'alisis de conglomerados sobre la misma muestra, en ambos casos consideramos los audios como series de tiempo y les damos un tratamiento espectral, de modo que podamos aplicar la divergencia K-L sobre las densidades espectrales.
 \subsection*{Perros vs gatos} % (fold)
 \label{sub:perros_vs_gatos}
-Nuestro ejemplo est\'a basado en un ejercicio propuesto por \cite{DATOS2}, utilizamos 115 audios de gatos y 64 de perros para entrenar el algoritmo y 69 de cada clase para validar nuestro modelo.\\
+Nuestro ejemplo est\'a basado en un ejercicio propuesto por \cite{DATOS2}, utilizamos 115 audios de gatos y 64 de perros para entrenar el algoritmo y 49 de cada clase para validar nuestro modelo.\\
 
-Primero tenemos un problema de desbalanceo en nuestro conjunto de entrenamiento, para tener la misma cantidad de observaciones de perros como de gatos utilizamos la t\'ecnica de bootstraping con reemplazo para sobremuestrear los 64 perros de entrenamiento, el resultado de remuestreo se muestra en la tabla 
-% \ref{tbl:conjunto_entre_perro}.\\
+Primero tenemos un problema de desbalanceo en nuestro conjunto de entrenamiento, para tener la misma cantidad de observaciones de perros como de gatos utilizamos la t\'ecnica de bootstraping con reemplazo para sobremuestrear los 64 perros de entrenamiento, el resultado de remuestreo se muestra en la tabla \ref{tbl:conjunto_entre_perro}.\\
 
 \subsubsection*{An\'alisis exploratorio} % (fold)
 \label{ssub:analisis_exploratorio}
@@ -203,7 +201,7 @@ De \cite{SUBJ_SP1} podemos dividir el proceso de clasificaci\'on en los siguient
 Utilizamos la <<ventana>> de Tukey-Hanning \cite{PRIESTLEY}, de modo que nuestra funci\'on de densidad espectral esta dada por
 $$\hat{h}(w)=\frac{1}{4}\hat{h_0}\left(w-\frac{\pi}{M}\right)+\frac{1}{2}\hat{h_0}\left(w\right)+\frac{1}{4}\hat{h_0}\left(w+\frac{\pi}{M}\right)$$
 Donde $\hat{h_0}$ es el periodograma truncado dado por 
-$$\hat{h_0}=\frac{1}{2\pi}\sum^{M}_{s=-M}\hat{R}(s)\cos(sw)$$, donde a su vez $\hat{R}(s)$ es el estimador de la funcio\'on de autocovarianza
+$$\hat{h_0}=\frac{1}{2\pi}\sum^{M}_{s=-M}\hat{R}(s)\cos(sw)$$, donde a su vez $\hat{R}(s)$ es el estimador de la funci\'on de autocovarianza
 $$\hat{R}(s)=\frac{1}{N}\sum^{N-|s|}_{t=1}(X_t-\bar{X})(X_{t+|r|}-\bar{X})$$
 
 El siguiente paso es promediar las densidades espectrales por grupo 
@@ -229,44 +227,59 @@ Donde $\hat{h}_{GEi}(w)$ es la densidad espectral de la i-\'esima serie de tiemp
 % subsubsection estimar_la_densidad_espectral (end)
 \subsubsection*{Regla de clasificaci\'on} % (fold)
 \label{ssub:regla_de_clasificacion}
-La figura \ref{plot:de_p1} nos muestra la densidad espectral de los audios de gatos, podemos notar que tiene su moda en frecuencias bajas, y luego decae lentamente a 0. En cambio, la densidad espectral para ladridos, \ref{plot:de_p1}, tienen su moda en frecuencias medias, y decae r\'apidamente a 0. Ahora que tenemos nuestros espectros promedio, el siguiente paso es la regla de clasificaci\'on
+La figura \ref{plot:de_g1} nos muestra la densidad espectral de los audios de gatos, podemos notar que tiene su moda en frecuencias bajas, y luego decae lentamente a 0. En cambio, la densidad espectral para ladridos, \ref{plot:de_p1}, tienen su moda en frecuencias medias, y decae r\'apidamente a 0. Ahora que tenemos nuestros espectros promedio, el siguiente paso es la regla de clasificaci\'on\\
 
+$$\text{clasifica } \hat{f} \text{ en}\left\{
+\begin{array}{ccc}
+Gatos &\text{si}&I(\bar{\hat{h}}_G, f)\leq I(\bar{\hat{h}}_P, f)\\
+Perros &\text{si}&I(\bar{\hat{h}}_G, f)> I(\bar{\hat{h}}_P, f)\\
+\end{array}
+\right\}$$
 
-Donde $I(f, g)=\int_x f(x)\log(\frac{f(x)}{g(x)})dx$ es la informaci\'on de Kullback \cite{KULLBACK_2}. 
+Donde $I(f, g)=\int_x f(x)\log(\frac{f(x)}{g(x)})dx$ es la informaci\'on de Kullback \cite{KULLBACK_2}. \\
 
-Los resultados de aplicar la regla de clasificaci\'on fueron 19 series fueron clasificadas en el grupo de perros, pero en realidad son sonidos de gatos, 22 sonidos de perros fueron clasificados incorrectamente en el grupo de gatos. La tasa de error fue del $18\%$.\\
+Los resultados de aplicar la regla de clasificaci\'on fueron 19 series fueron clasificadas en el grupo de perros, pero en realidad son sonidos de gatos, 22 sonidos de perros fueron clasificados incorrectamente en el grupo de gatos. La tasa de error fue del $18\%$, sensibilidad del $83\%$ y especificidad del $80\%$.
+\begin{table}[h]
 \begin{tabular}{ccc}
  & Gato & Perro\\
  Gatos & 96& 19\\
 Perro & 22 & 93\\
-\label{tbl:confusion_entre1}
 \end{tabular}
+\caption{Matriz de confusi\'on conjunto de entrenamiento}
+\label{tbl:confusion_entre1}
+\end{table}
 
-Para generalizar un poco m\'as nuestra regla decidimos introducir un umbral de decisi\'on $K$, en nuestro caso no hay ninguna p\'erdida asociada con clasificar err\'oneamente en una clase o en la otra, de modo que queremos escoger $K$ tal que la tasa de error sea el menor. Dado que la estructura del problema es no par\'ametrica encontrar $K$ se vuelve un problema num\'erico, por esto corrimos valores del umbral entre $-5$ y $5$, con saltos de $.1$, encontrando que nuestro mejor valor fue $K=.1$
+Para generalizar un poco m\'as nuestra regla decidimos introducir un umbral de decisi\'on $K$, en nuestro caso no hay ninguna p\'erdida asociada con clasificar err\'oneamente en una clase o en la otra, de modo que decidimos escoger $K$ con el criterio minimax.\\
 $$\text{clasifica } \hat{f} \text{ en}\left\{
 \begin{array}{ccc}
 Gatos &\text{si}&K\leq I(\bar{\hat{h}}_P, f)-I(\bar{\hat{h}}_G, f)\\
 Perros &\text{si}&K> I(\bar{\hat{h}}_P, f)-I(\bar{\hat{h}}_G, f)\\
 \end{array}
 \right\}$$
-La matriz de confusi\'on resultante fue \ref{tbl:confusion_entre2}, y la tasa de error bajo a $15\%$\\
-\begin{table}[h]
-\begin{tabular}{ccc}
- & Gato & Perro\\
- Gatos & 93& 22\\
-Perro & 14 & 93\\
-\label{tbl:confusion_entre2}
-\end{tabular}
-\end{table}
+El crieterio minimax consiste en escoger $K$ de modo que $$espec(K)=sens(K)$$
+donde $espec(K)=\frac{\text{Verdaderos negativos}}{\text{Total negativos}}$ y $sens(K)=\frac{\text{Verdaderos positivos}}{\text{Total positivos}}$. Dado que la estructura del problema es no par\'ametrica encontrar $K$ se vuelve un problema num\'erico, por esto corrimos valores del umbral entre $-5$ y $5$, con saltos de $.1$, encontrando que nuestro mejor valor fue $K=0$. Entonces nuestra regla sigue siendo la misma que al inicio.\\
 
-Si aplicamos la regla de clasificaci\'on con el umbral $K=.1$ al conjunto de entrenamiento tenemos una tasa de error del $16\%$, y la matriz de confusi\'on  \ref{tbl:confusion_prue1}, podemos notar que el error de clasificaci\'on de gatos incremento del $19\%$ a $26\%$ entre el conjunto de entrenamiento  y el de prueba, mientras que el de los perros disminuy\'o de $12\%$ a $4\%$. Esto nos indica que nuestra regla de clasificaci\'on tiene un sesgo de clasificar correctamente perros pero perdiendo gatos en el proceso.
+% La matriz de confusi\'on resultante fue \ref{tbl:confusion_entre2}, y la tasa de error bajo a $15\%$\\
+% \begin{table}[h]
+% \begin{tabular}{ccc}
+%  & Gato & Perro\\
+%  Gatos & 93& 22\\
+% Perro & 14 & 93\\
+% \end{tabular}
+% \caption{Matriz de confusi\'on conjunto de entrenamiento}
+% \label{tbl:confusion_entre2}
+% \end{table}
+
+Si aplicamos la regla de clasificaci\'on con el umbral al conjunto de entrenamiento tenemos una tasa de error del $13\%$, y la matriz de confusi\'on  \ref{tbl:confusion_prue1}, la sensibilidad fue $81\%$ y la especificidad aumento al $93\%$. Resultados bastante estables.
+% podemos notar que el error de clasificaci\'on de gatos incremento del $19\%$ a $26\%$ entre el conjunto de entrenamiento  y el de prueba, mientras que el de los perros disminuy\'o de $12\%$ a $4\%$. Esto nos indica que nuestra regla de clasificaci\'on tiene un sesgo de clasificar correctamente perros pero perdiendo gatos en el proceso.
 \begin{table}[h]
 \begin{tabular}{ccc}
  & Gato & Perro\\
- Gatos & 36& 13\\
+ Gatos & 40& 9\\
 Perro & 3 & 46\\
-\label{tbl:confusion_prue1}
 \end{tabular}
+\caption{Matriz de confusi\'on conjunto de prueba}
+\label{tbl:confusion_prue1}
 \end{table}
 
 Recordando que la muestra incluye <<sonidos similares a gatos y perros>>, es natural que algunos sonidos queden erroneamente clasificados. Por ejemplo, algunos observaciones suenan como discos rayados (cat\_167.wav y cat\_165.wav, del conjunto de entrenamiento), u observaciones que incluyen ladridos y maullidos (cat\_97.wav, cat\_98.wav, cat\_99.wav). Otras simplemente carecen de maullido o ladrido y son ruido de fondo (dog\_barking\_107.wav, dog\_barking\_109.wav).
@@ -729,8 +742,8 @@ cat\_92.wav & \textbf{cat\_93.wav} & \textbf{cat\_95.wav}\\
 \textbf{cat\_96.wav} & \textbf{cat\_97.wav} & \textbf{cat\_98.wav}\\
 \textbf{cat\_99.wav}
 \end{tabular}
-\label{tbl:conjunto_entre_gato}
 \caption{Gatos en el conjunto de entrenamiento}
+\label{tbl:conjunto_entre_gato}
 \end{table}
 
 \begin{table}[h]
@@ -798,8 +811,8 @@ dog\_barking\_91.wav & dog\_barking\_95.wav\\
 \textbf{\underline{dog\_barking\_107.wav}} & \underline{dog\_barking\_74.wav}\\
 \underline{dog\_barking\_13.wav}
 \end{tabular}
-\label{tbl:conjunto_entre_perro}
 \caption{Perros en el conjunto de entrenamiento, los archivos subrayados son los resultados del remuestreo.}
+\label{tbl:conjunto_entre_perro}
 \end{table}
  \begin{table}[h]
 \begin{tabular}{ccc}
@@ -821,8 +834,8 @@ cat\_74.wav & cat\_77.wav & \textbf{cat\_8.wav}\\
 \textbf{cat\_83.wav} & \textbf{cat\_89.wav} & cat\_9.wav\\
 cat\_94.wav
 \end{tabular}
-\label{tbl:conjunto_prueba_gato}
 \caption{Gatos en el conjunto de prueba}
+\label{tbl:conjunto_prueba_gato}
 \end{table}
 \begin{table}[h]
 \begin{tabular}{cc}
@@ -852,9 +865,8 @@ dog\_barking\_92.wav& dog\_barking\_93.wav\\
 \textbf{dog\_barking\_94.wav}& dog\_barking\_96.wav\\
 dog\_barking\_97.wav
 \end{tabular}
-\label{tbl:conjunto_prueba_perro}
 \caption{Perros en el conjunto de prueba}
+\label{tbl:conjunto_prueba_perro}
 \end{table}
 % section anexo_1_muestra (end)
-
 \end{document}
